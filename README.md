@@ -9,3 +9,5 @@ Design goals
 - A worker needs to explicitly specify job success. However, if in pre-determined time a success status is not submitted then the job is retried
 - Clear visibility in terms of number of jobs submitted, jobs being processed, jobs in queue, jobs failed
 - A job history is maintained for a given period of time for all submitted jobs
+
+## jeeves is still in development phase and all contributions are welcome
