@@ -10,4 +10,5 @@ Design goals
 - Clear visibility in terms of number of jobs submitted, jobs being processed, jobs in queue, jobs failed
 - A job history is maintained for a given period of time for all submitted jobs
 
-## jeeves is still in development phase and all contributions are welcome
+
+### jeeves is still in development phase and all contributions are welcome
