@@ -64,6 +64,10 @@ public class StateManagerTest extends TestCase {
         StatePersistenceManager manager = StatePersistenceManager.getInstance();
         Map<String, String> state = manager.getState(queueName);
 
+        for(Map.Entry<String, String> entry : state.entrySet()) {
+            logger.info(format("[%s]=%s", entry.getKey(), entry.getValue()));
+        }
+
         assertTrue( state!= null );
         assertTrue(state.get("queue-id").equals("495012"));
         assertTrue(state.get("lastjob-id").equals("2341324"));
