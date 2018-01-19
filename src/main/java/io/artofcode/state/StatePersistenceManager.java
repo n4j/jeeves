@@ -18,6 +18,7 @@ package io.artofcode.state;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -35,14 +36,14 @@ import java.util.Properties;
  * @author  Neeraj Shah
  * @since   0.1
  */
-class StateManager {
+public class StatePersistenceManager {
 
-	private static StateManager instance;
+	private static StatePersistenceManager instance;
 
 	static {
 		if(instance == null) {
-			synchronized(StateManager.class) {
-				instance = new StateManager();
+			synchronized(StatePersistenceManager.class) {
+				instance = new StatePersistenceManager();
 			}
 		}
 	}
@@ -51,7 +52,7 @@ class StateManager {
 
 	private final String stateDirPath;
 
-	private StateManager() {
+	private StatePersistenceManager() {
 		String userHome = System.getProperty("user.home");
 		this.stateDirPath = ((userHome == null || userHome.equals("")) ? 
 								System.getProperty("user.dir") : userHome)
@@ -60,10 +61,29 @@ class StateManager {
 	}
 
 	/**
-	 * @return Singleton instance of class StateManager
+	 * @return Singleton instance of class StatePersistenceManager
 	 */
-	public static StateManager getInstance() {
+	public static StatePersistenceManager getInstance() {
 		return instance;
+	}
+
+	/**
+	 * Saves the state of the queue in platform specific state directory
+	 */
+	public synchronized void saveState(Map<String, String> state, String queue){
+		Properties queueProperties = getProperties(queue);
+
+		for(Map.Entry<String, String> entry : state.entrySet()){
+			queueProperties.setProperty(entry.getKey(), entry.getValue());
+		}
+		
+		try(FileOutputStream fout = new FileOutputStream(getQueueStatePath(queue))) {
+			queueProperties.save(fout, String.format("AUTO GENERATED STATE FILE. DO NOT EDIT!!!!"));
+		} catch(FileNotFoundException fnfe) {
+			throw new RuntimeException(fnfe);
+		} catch(IOException ioe) {
+			throw new RuntimeException(ioe);
+		}
 	}
 
 	/**
@@ -73,17 +93,40 @@ class StateManager {
 	 * @return A Map&lt;String, String&gt; containing state information
 	 * stored as key value paris
 	 */
-	public Map<Object, Object> getState(String queue) {
+	public synchronized Map<String, String> getState(String queue) {
+		Properties queueProperties = getProperties(queue);
+		Map<String, String> propsMap = new HashMap<>();
+
+		for(Map.Entry<Object, Object> prop : queueProperties.entrySet()) {
+			propsMap.put(prop.getKey().toString(), prop.getValue().toString());
+		}
+		return propsMap;
+	}
+
+	/**
+	 * Reads the state information of the specified queue from platform
+	 * specific state directory and returns as Properties object
+	 *
+	 * @return Object of class Properties containing state information
+	 */
+	private Properties getProperties(String queue) {
 		try(FileInputStream fin = new 
-			FileInputStream(stateDirPath + File.separator + queue)){
-			Properties props = new Properties();
-			props.load(fin);
-			return new HashMap<Object, Object>(props);
+			FileInputStream(getQueueStatePath(queue))){
+
+			Properties queueProperties = new Properties();
+			queueProperties.load(fin);
+			return queueProperties;
+
 		} catch(FileNotFoundException fnfe) {
-			throw new RuntimeException(fnfe);
+			// Properties file doesnot exist, return empty properties
+			return new Properties();
 		} catch(IOException ioe) {
 			throw new RuntimeException(ioe);
 		}
+	}
+
+	String getQueueStatePath(String queue) {
+		return stateDirPath + File.separator + queue;
 	}
 
 	/**
@@ -91,9 +134,9 @@ class StateManager {
 	 * StateManger instance. Helpful when the instance is serialized 
 	 * and then de-serialized.
 	 *
-	 * @return System wide singleton StateManager instance
+	 * @return System wide singleton StatePersistenceManager instance
 	 */
-	private StateManager readResolve() {
+	private StatePersistenceManager readResolve() {
 		return instance;
 	}
 
@@ -123,5 +166,5 @@ class StateManager {
 		return this.stateDirPath;
 	}
 
-	private final Logger logger = Logger.getLogger(StateManager.class.toString());
+	private final Logger logger = Logger.getLogger(StatePersistenceManager.class.toString());
 }

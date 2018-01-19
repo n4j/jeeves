@@ -15,10 +15,11 @@ limitations under the License.
 */
 
 package io.artofcode;
-
+import static java.lang.String.*;
 import redis.clients.jedis.*;
 
-public class RedisQueueManager implements AutoCloseable {
+public class RedisQueueManager 
+	implements AutoCloseable {
 
 	private final String queue;
 
@@ -31,6 +32,17 @@ public class RedisQueueManager implements AutoCloseable {
 
 	public String get() {
 		return jedis.lpop(queue);
+	}
+
+	/**
+	 * All the workers processing a given queue are given unique ids which is used
+	 * to identify worker specific in-process queue and metadata. The id is created
+	 * by simple incrementing counter of queue:worker-ids key in Redis.
+	 *
+	 * @return Worker id created by incrementing key queue:worker-ids
+	 */
+	public long createWorkerId() {
+		return jedis.incr(format("%s:worker-ids", queue));
 	}
 
 	@Override

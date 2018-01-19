@@ -19,12 +19,16 @@ package io.artofcode.state;
 import static java.lang.String.*;
 import java.io.File;
 import java.util.logging.Logger;
+import java.util.Map;
+import java.util.HashMap;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 public class StateManagerTest extends TestCase {
+
+    private final String queueName = "test-queue";
 
 	public StateManagerTest(String testName) { 
 		super(testName); 
@@ -34,15 +38,42 @@ public class StateManagerTest extends TestCase {
         return new TestSuite( StateManagerTest.class );
     }
 
-    public void testStateDirectoryExists() {
-    	StateManager manager = StateManager.getInstance();
-    	String stateDirPath = manager.getStateDirPath();
-    	File stateDir = new File(stateDirPath);
-    	
-    	assertTrue( new File(stateDirPath).exists() );
+    public void testStateDirCreation() {
+        StatePersistenceManager manager = StatePersistenceManager.getInstance();
+        String stateDirPath = manager.getStateDirPath();
+        File stateDir = new File(stateDirPath);
+        
+        assertTrue( new File(stateDirPath).exists() );
 
-    	logger.info(format("Path of state directory %s", stateDirPath));
+        logger.info(format("Path of state directory %s", stateDirPath));
     }
+
+    public void testStatePersistence() {
+        Map<String, String> state = new HashMap<>();
+        state.put("queue-id", "495012");
+        state.put("lastjob-id", "2341324");
+        state.put("worker-name", "jeeves:url:processor");
+
+        StatePersistenceManager manager = StatePersistenceManager.getInstance();
+        manager.saveState(state, queueName);
+        
+        assertTrue( new File(manager.getQueueStatePath(queueName)).exists() );
+    }
+
+    public void testStateRead() {
+        StatePersistenceManager manager = StatePersistenceManager.getInstance();
+        Map<String, String> state = manager.getState(queueName);
+
+        for(Map.Entry<String, String> entry : state.entrySet()) {
+            logger.info(format("[%s]=%s", entry.getKey(), entry.getValue()));
+        }
+
+        assertTrue( state!= null );
+        assertTrue(state.get("queue-id").equals("495012"));
+        assertTrue(state.get("lastjob-id").equals("2341324"));
+        assertTrue(state.get("worker-name").equals("jeeves:url:processor"));
+    }
+
 
     private final Logger logger = Logger.getLogger(StateManagerTest.class.toString());
 }
