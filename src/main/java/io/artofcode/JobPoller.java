@@ -23,7 +23,8 @@ import java.util.Iterator;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
-class JobPoller implements Iterable<String> {
+class JobPoller 
+	implements Iterable<String> {
 
 	private final String queue;
 

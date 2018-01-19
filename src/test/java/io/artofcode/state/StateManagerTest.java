@@ -31,7 +31,8 @@ public class StateManagerTest extends TestCase {
     private final String queueName = "test-queue";
 
 	public StateManagerTest(String testName) { 
-		super(testName); 
+		super(testName);
+        persistState();
 	}
 
 	public static Test suite() {
@@ -48,7 +49,7 @@ public class StateManagerTest extends TestCase {
         logger.info(format("Path of state directory %s", stateDirPath));
     }
 
-    public void testStatePersistence() {
+    private void persistState() {
         Map<String, String> state = new HashMap<>();
         state.put("queue-id", "495012");
         state.put("lastjob-id", "2341324");
