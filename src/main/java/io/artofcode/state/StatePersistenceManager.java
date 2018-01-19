@@ -36,14 +36,14 @@ import java.util.Properties;
  * @author  Neeraj Shah
  * @since   0.1
  */
-class StateManager {
+public class StatePersistenceManager {
 
-	private static StateManager instance;
+	private static StatePersistenceManager instance;
 
 	static {
 		if(instance == null) {
-			synchronized(StateManager.class) {
-				instance = new StateManager();
+			synchronized(StatePersistenceManager.class) {
+				instance = new StatePersistenceManager();
 			}
 		}
 	}
@@ -52,7 +52,7 @@ class StateManager {
 
 	private final String stateDirPath;
 
-	private StateManager() {
+	private StatePersistenceManager() {
 		String userHome = System.getProperty("user.home");
 		this.stateDirPath = ((userHome == null || userHome.equals("")) ? 
 								System.getProperty("user.dir") : userHome)
@@ -61,16 +61,16 @@ class StateManager {
 	}
 
 	/**
-	 * @return Singleton instance of class StateManager
+	 * @return Singleton instance of class StatePersistenceManager
 	 */
-	public static StateManager getInstance() {
+	public static StatePersistenceManager getInstance() {
 		return instance;
 	}
 
 	/**
 	 * Saves the state of the queue in platform specific state directory
 	 */
-	public void saveState(Map<String, String> state, String queue){
+	public synchronized void saveState(Map<String, String> state, String queue){
 		Properties queueProperties = getProperties(queue);
 
 		for(Map.Entry<String, String> entry : state.entrySet()){
@@ -93,9 +93,14 @@ class StateManager {
 	 * @return A Map&lt;String, String&gt; containing state information
 	 * stored as key value paris
 	 */
-	public Map<Object, Object> getState(String queue) {
+	public synchronized Map<String, String> getState(String queue) {
 		Properties queueProperties = getProperties(queue);
-		return new HashMap<>(queueProperties);
+		Map<String, String> propsMap = new HashMap<>();
+
+		for(Map.Entry<Object, Object> prop : queueProperties.entrySet()) {
+			propsMap.put(prop.getKey().toString(), prop.getValue().toString());
+		}
+		return propsMap;
 	}
 
 	/**
@@ -129,9 +134,9 @@ class StateManager {
 	 * StateManger instance. Helpful when the instance is serialized 
 	 * and then de-serialized.
 	 *
-	 * @return System wide singleton StateManager instance
+	 * @return System wide singleton StatePersistenceManager instance
 	 */
-	private StateManager readResolve() {
+	private StatePersistenceManager readResolve() {
 		return instance;
 	}
 
@@ -161,5 +166,5 @@ class StateManager {
 		return this.stateDirPath;
 	}
 
-	private final Logger logger = Logger.getLogger(StateManager.class.toString());
+	private final Logger logger = Logger.getLogger(StatePersistenceManager.class.toString());
 }

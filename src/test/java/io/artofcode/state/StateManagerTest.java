@@ -39,7 +39,7 @@ public class StateManagerTest extends TestCase {
     }
 
     public void testStateDirCreation() {
-        StateManager manager = StateManager.getInstance();
+        StatePersistenceManager manager = StatePersistenceManager.getInstance();
         String stateDirPath = manager.getStateDirPath();
         File stateDir = new File(stateDirPath);
         
@@ -54,15 +54,15 @@ public class StateManagerTest extends TestCase {
         state.put("lastjob-id", "2341324");
         state.put("worker-name", "jeeves:url:processor");
 
-        StateManager manager = StateManager.getInstance();
+        StatePersistenceManager manager = StatePersistenceManager.getInstance();
         manager.saveState(state, queueName);
         
         assertTrue( new File(manager.getQueueStatePath(queueName)).exists() );
     }
 
     public void testStateRead() {
-        StateManager manager = StateManager.getInstance();
-        Map<Object, Object> state = manager.getState(queueName);
+        StatePersistenceManager manager = StatePersistenceManager.getInstance();
+        Map<String, String> state = manager.getState(queueName);
 
         assertTrue( state!= null );
         assertTrue(state.get("queue-id").equals("495012"));

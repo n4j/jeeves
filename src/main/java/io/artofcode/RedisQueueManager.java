@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 package io.artofcode;
-
+import static java.lang.String.*;
 import redis.clients.jedis.*;
 
 public class RedisQueueManager implements AutoCloseable {
@@ -31,6 +31,10 @@ public class RedisQueueManager implements AutoCloseable {
 
 	public String get() {
 		return jedis.lpop(queue);
+	}
+
+	public long createWorkerId() {
+		return jedis.incr(format("queue:worker-ids"));
 	}
 
 	@Override

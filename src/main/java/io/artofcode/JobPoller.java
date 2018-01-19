@@ -17,6 +17,7 @@ limitations under the License.
 package io.artofcode;
 
 import static java.lang.String.*;
+import io.artofocde.state.QueueState;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.logging.Logger;
@@ -32,10 +33,14 @@ class JobPoller implements Iterable<String> {
 
 	private volatile boolean continuePolling = true;
 
+	private QueueState state;
+
 	public JobPoller(String queue, String cron, Logger logger) {
 		this.queue = queue;
 		this.logger = logger;
 		this.jobIterator = new JobPollerIterator();
+		this.state = new QueueState(queue);
+		logger.info(format("Queue id %d", state.getWorkerId()));
 	}
 
 	@Override
