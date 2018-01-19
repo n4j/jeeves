@@ -18,6 +18,7 @@ package io.artofcode.state;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -67,6 +68,25 @@ class StateManager {
 	}
 
 	/**
+	 * Saves the state of the queue in platform specific state directory
+	 */
+	public void saveState(Map<String, String> state, String queue){
+		Properties queueProperties = getProperties(queue);
+
+		for(Map.Entry<String, String> entry : state.entrySet()){
+			queueProperties.setProperty(entry.getKey(), entry.getValue());
+		}
+		
+		try(FileOutputStream fout = new FileOutputStream(getQueueStatePath(queue))) {
+			queueProperties.save(fout, String.format("AUTO GENERATED STATE FILE. DO NOT EDIT!!!!"));
+		} catch(FileNotFoundException fnfe) {
+			throw new RuntimeException(fnfe);
+		} catch(IOException ioe) {
+			throw new RuntimeException(ioe);
+		}
+	}
+
+	/**
 	 * Returns saved state information for the task processor
 	 * identified by queue name
 	 *
@@ -74,16 +94,34 @@ class StateManager {
 	 * stored as key value paris
 	 */
 	public Map<Object, Object> getState(String queue) {
+		Properties queueProperties = getProperties(queue);
+		return new HashMap<>(queueProperties);
+	}
+
+	/**
+	 * Reads the state information of the specified queue from platform
+	 * specific state directory and returns as Properties object
+	 *
+	 * @return Object of class Properties containing state information
+	 */
+	private Properties getProperties(String queue) {
 		try(FileInputStream fin = new 
-			FileInputStream(stateDirPath + File.separator + queue)){
-			Properties props = new Properties();
-			props.load(fin);
-			return new HashMap<Object, Object>(props);
+			FileInputStream(getQueueStatePath(queue))){
+
+			Properties queueProperties = new Properties();
+			queueProperties.load(fin);
+			return queueProperties;
+
 		} catch(FileNotFoundException fnfe) {
-			throw new RuntimeException(fnfe);
+			// Properties file doesnot exist, return empty properties
+			return new Properties();
 		} catch(IOException ioe) {
 			throw new RuntimeException(ioe);
 		}
+	}
+
+	String getQueueStatePath(String queue) {
+		return stateDirPath + File.separator + queue;
 	}
 
 	/**
