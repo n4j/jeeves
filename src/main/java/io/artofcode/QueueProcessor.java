@@ -17,7 +17,6 @@ limitations under the License.
 package io.artofcode;
 
 import static java.lang.String.*;
-import java.lang.InterruptedException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.locks.Lock;
@@ -43,8 +42,6 @@ public class QueueProcessor<T> implements AutoCloseable {
 
 	private Consumer<T> consumer;
 
-	private String cronExpression;
-
 	private ExecutorService executor;
 
 	private final Logger logger = Logger.getLogger(QueueProcessor.class.toString());
@@ -66,7 +63,6 @@ public class QueueProcessor<T> implements AutoCloseable {
 	 *
 	 * @param queue a Redis queue from which to fetch the tasks
 	 * @param consumer a functional object to which the taks is delivered as POJO
-	 * @param cronExpression specifies the polling schedule
 	 * @param executor the messages are processed by {@code Consumer} in this ThreadPool
 	 * @param model received task is parsed as this POJO class
 	 */

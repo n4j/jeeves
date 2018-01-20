@@ -17,8 +17,6 @@ limitations under the License.
 package io.artofcode;
 
 import static java.lang.String.*;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -56,11 +54,8 @@ public class EntityMapperTest extends TestCase {
 							.consumer((job) -> {})
 							.build();
 		} catch(RuntimeException re) {
-			assertTrue(true);
+			assertTrue(re!=null);
 			return;
 		}
-		assertTrue(false);
 	}
-
-	private final Logger logger = Logger.getLogger(EntityMapperTest.class.toString());
 }

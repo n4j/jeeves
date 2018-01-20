@@ -72,8 +72,6 @@ public class AppTest
         timer.schedule(task, date);
 
         processor.start();
-        
-        assertTrue( true );
     }
     private final Logger logger = Logger.getLogger(AppTest.class.toString());
 }

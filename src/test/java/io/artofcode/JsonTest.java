@@ -17,7 +17,6 @@ limitations under the License.
 package io.artofcode;
 
 import static java.lang.String.*;
-import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.logging.Logger;
 import java.util.logging.Level;
