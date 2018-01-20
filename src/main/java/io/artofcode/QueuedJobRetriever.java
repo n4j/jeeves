@@ -17,6 +17,8 @@ class QueuedJobRetriver {
 
     private volatile boolean continuePolling = true;
 
+    private final Logger logger = Logger.getLogger(QueuedJobRetriver.class.toString());
+
 	QueuedJobRetriver(String queue, String inprocessQueue) {
         this.queue = queue;
         this.inprocessQueue = inprocessQueue;
@@ -35,6 +37,4 @@ class QueuedJobRetriver {
     public void stopPolling() {
         continuePolling = false;
     }
-
-    private final Logger logger = Logger.getLogger(QueuedJobRetriver.class.toString());
 }

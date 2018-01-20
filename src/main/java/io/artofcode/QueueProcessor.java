@@ -168,8 +168,6 @@ public class QueueProcessor<T> implements AutoCloseable {
 
 		private Consumer<T> consumer;
 
-		private String cronExpression;
-
 		private ExecutorService executor;
 
 		private Logger logger;

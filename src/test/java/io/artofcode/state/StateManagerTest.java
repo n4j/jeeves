@@ -30,6 +30,8 @@ public class StateManagerTest extends TestCase {
 
     private final String queueName = "test-queue";
 
+    private final Logger logger = Logger.getLogger(StateManagerTest.class.toString());
+
 	public StateManagerTest(String testName) { 
 		super(testName);
         persistState();
@@ -42,7 +44,6 @@ public class StateManagerTest extends TestCase {
     public void testStateDirCreation() {
         StatePersistenceManager manager = StatePersistenceManager.getInstance();
         String stateDirPath = manager.getStateDirPath();
-        File stateDir = new File(stateDirPath);
         
         assertTrue( new File(stateDirPath).exists() );
 
@@ -74,7 +75,4 @@ public class StateManagerTest extends TestCase {
         assertTrue(state.get("lastjob-id").equals("2341324"));
         assertTrue(state.get("worker-name").equals("jeeves:url:processor"));
     }
-
-
-    private final Logger logger = Logger.getLogger(StateManagerTest.class.toString());
 }

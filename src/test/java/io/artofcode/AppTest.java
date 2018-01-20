@@ -31,6 +31,7 @@ import junit.framework.TestSuite;
 public class AppTest 
     extends TestCase
 {
+    private final Logger logger = Logger.getLogger(AppTest.class.toString());
 
     public AppTest( String testName )
     {
@@ -73,5 +74,5 @@ public class AppTest
 
         processor.start();
     }
-    private final Logger logger = Logger.getLogger(AppTest.class.toString());
+    
 }

@@ -32,6 +32,8 @@ import com.google.gson.*;
  */
 public class JsonTest extends TestCase {
 
+    private final Logger logger = Logger.getLogger(JsonTest.class.toString());
+
 	public JsonTest(String testName) {
 		super(testName);
 	}
@@ -58,5 +60,4 @@ public class JsonTest extends TestCase {
     	logger.log( Level.INFO, job.toString() );
     }
 
-    private final Logger logger = Logger.getLogger(JsonTest.class.toString());
 }
