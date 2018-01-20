@@ -34,30 +34,30 @@ public class JsonTest extends TestCase {
 
     private final Logger logger = Logger.getLogger(JsonTest.class.toString());
 
-	public JsonTest(String testName) {
-		super(testName);
-	}
+    public JsonTest(String testName) {
+        super(testName);
+    }
 
-	public static Test suite() {
+    public static Test suite() {
         return new TestSuite( JsonTest.class );
     }
 
     public void testPojoToJson() {
-    	Gson gson = new Gson();
-    	ScrapJob job = new ScrapJob("https://google.com", 12, new GregorianCalendar());
-    	String json = gson.toJson(job);
+        Gson gson = new Gson();
+        ScrapJob job = new ScrapJob("https://google.com", 12, new GregorianCalendar());
+        String json = gson.toJson(job);
 
-    	assertTrue( json != null );
-    	logger.log( Level.INFO, json );
+        assertTrue( json != null );
+        logger.log( Level.INFO, json );
     }
 
     public void testJsonGsonParse() {
-    	String json = "{\"url\":\"https://google.com\",\"numHits\":12,\"createdOn\":{\"year\":2018,\"month\":0,\"dayOfMonth\":15,\"hourOfDay\":10,\"minute\":35,\"second\":21}}";
-    	Gson gson = new Gson();
-    	ScrapJob job = gson.fromJson( json, ScrapJob.class );
+        String json = "{\"url\":\"https://google.com\",\"numHits\":12,\"createdOn\":{\"year\":2018,\"month\":0,\"dayOfMonth\":15,\"hourOfDay\":10,\"minute\":35,\"second\":21}}";
+        Gson gson = new Gson();
+        ScrapJob job = gson.fromJson( json, ScrapJob.class );
 
-    	assertTrue( job != null );
-    	logger.log( Level.INFO, job.toString() );
+        assertTrue( job != null );
+        logger.log( Level.INFO, job.toString() );
     }
 
 }

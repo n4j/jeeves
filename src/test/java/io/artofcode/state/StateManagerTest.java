@@ -32,12 +32,12 @@ public class StateManagerTest extends TestCase {
 
     private final Logger logger = Logger.getLogger(StateManagerTest.class.toString());
 
-	public StateManagerTest(String testName) { 
-		super(testName);
+    public StateManagerTest(String testName) { 
+        super(testName);
         persistState();
-	}
+    }
 
-	public static Test suite() {
+    public static Test suite() {
         return new TestSuite( StateManagerTest.class );
     }
 

@@ -20,16 +20,16 @@ import com.google.gson.*;
 
 class EntityMapper<T> {
 
-	private final Gson gson;
+    private final Gson gson;
 
-	private final Class<T> typeOf;
+    private final Class<T> typeOf;
 
-	public EntityMapper(Class<T> typeOf) {
-		gson = new Gson();
-		this.typeOf = typeOf;
-	}
-
-	public T parse(String json) {
-		return gson.fromJson(json, typeOf);
-	}
+    public EntityMapper(Class<T> typeOf) {
+        gson = new Gson();
+        this.typeOf = typeOf;
+    }
+    
+    public T parse(String json) {
+        return gson.fromJson(json, typeOf);
+    }
 }

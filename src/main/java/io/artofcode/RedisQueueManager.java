@@ -26,36 +26,36 @@ import redis.clients.jedis.*;
  */
 public class RedisQueueManager implements AutoCloseable {
 
-	private final String queue;
+    private final String queue;
 
-	private final Jedis jedis;
+    private final Jedis jedis;
 
-	public RedisQueueManager(String queue) {
-		this.queue = queue;
-		this.jedis = new Jedis("localhost");
-	}
+    public RedisQueueManager(String queue) {
+        this.queue = queue;
+        this.jedis = new Jedis("localhost");
+    }
 
-	public String get() {
-		return jedis.lpop(queue);
-	}
+    public String get() {
+        return jedis.lpop(queue);
+    }
 
-	public String brpoplpush(String destination, int timeout) {
-		return jedis.brpoplpush(queue, destination, timeout);
-	}
+    public String brpoplpush(String destination, int timeout) {
+        return jedis.brpoplpush(queue, destination, timeout);
+    }
 
-	/**
-	 * All the workers processing a given queue are given unique ids which is used
-	 * to identify worker specific in-process queue and metadata. The id is created
-	 * by simple incrementing counter of queue:worker-ids key in Redis.
-	 *
-	 * @return Worker id created by incrementing key queue:worker-ids
-	 */
-	public long createWorkerId() {
-		return jedis.incr(format("%s:worker-ids", queue));
-	}
+    /**
+     * All the workers processing a given queue are given unique ids which is used
+     * to identify worker specific in-process queue and metadata. The id is created
+     * by simple incrementing counter of queue:worker-ids key in Redis.
+     *
+     * @return Worker id created by incrementing key queue:worker-ids
+     */
+    public long createWorkerId() {
+        return jedis.incr(format("%s:worker-ids", queue));
+    }
 
-	@Override
-	public void close() {
-		jedis.close();
-	}
+    @Override
+    public void close() {
+        jedis.close();
+    }
 }
