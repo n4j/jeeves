@@ -29,33 +29,33 @@ import com.google.gson.*;
  */
 public class EntityMapperTest extends TestCase {
 
-	public EntityMapperTest(String testName) {
-		super(testName);
-	}
+    public EntityMapperTest(String testName) {
+        super(testName);
+    }
 
-	public static Test suite() {
-		return new TestSuite(EntityMapperTest.class);
-	}
+    public static Test suite() {
+        return new TestSuite(EntityMapperTest.class);
+    }
 
-	public void testBasic() {
-		final QueueProcessor processor = new QueueProcessor.Builder<ScrapJob>("crawlers:url")
-						.model(ScrapJob.class)
-						.consumer((job) -> {})
-						.build();
+    public void testBasic() {
+        final QueueProcessor processor = new QueueProcessor.Builder<ScrapJob>("crawlers:url")
+                        .model(ScrapJob.class)
+                        .consumer((job) -> {})
+                        .build();
 
-	    assertTrue(processor != null);
-	}
+        assertTrue(processor != null);
+    }
 
-	public void testModelRequired() {
-		QueueProcessor processor;
-		try {
-			processor = new QueueProcessor.Builder<ScrapJob>("crawlers:url")
-							.consumer((job) -> {})
-							.build();
-		} catch(RuntimeException re) {
-			assertTrue(re != null);
-			return;
-		}
-		assertTrue(processor != null);
-	}
+    public void testModelRequired() {
+        QueueProcessor processor;
+        try {
+            processor = new QueueProcessor.Builder<ScrapJob>("crawlers:url")
+                            .consumer((job) -> {})
+                            .build();
+        } catch(RuntimeException re) {
+            assertTrue(re != null);
+            return;
+        }
+        assertTrue(processor != null);
+    }
 }

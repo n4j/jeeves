@@ -38,39 +38,39 @@ import java.util.logging.Level;
  */
 public class QueueProcessor<T> implements AutoCloseable {
 
-	private final String queue;
+        private final String queue;
 
-	private Consumer<T> consumer;
+        private Consumer<T> consumer;
 
-	private ExecutorService executor;
+        private ExecutorService executor;
 
-	private final Logger logger = Logger.getLogger(QueueProcessor.class.toString());
+        private final Logger logger = Logger.getLogger(QueueProcessor.class.toString());
 
-	private int numRetries;
+        private int numRetries;
 
-	private JobPoller poller;
+        private JobPoller poller;
 
-	private volatile boolean isClosed = false;
+        private volatile boolean isClosed = false;
 
-	private Class<T> model;
+        private Class<T> model;
 
-	private final Semaphore semaphore;
+        private final Semaphore semaphore;
 
-	private final Lock globalLock;
+        private final Lock globalLock;
 
-	/**
-	 * Creates a Redis Queue processor
-	 *
-	 * @param queue a Redis queue from which to fetch the tasks
-	 * @param consumer a functional object to which the taks is delivered as POJO
-	 * @param executor the messages are processed by {@code Consumer} in this ThreadPool
-	 * @param model received task is parsed as this POJO class
-	 */
-	private QueueProcessor(String queue,
-						   Consumer<T> consumer,
-						   ExecutorService executor,
-						   int numRetries,
-						   Class<T> model) {
+        /**
+        * Creates a Redis Queue processor
+        *
+        * @param queue a Redis queue from which to fetch the tasks
+        * @param consumer a functional object to which the taks is delivered as POJO
+        * @param executor the messages are processed by {@code Consumer} in this ThreadPool
+        * @param model received task is parsed as this POJO class
+        */
+        private QueueProcessor(String queue,
+                           Consumer<T> consumer,
+                           ExecutorService executor,
+                           int numRetries,
+                           Class<T> model) {
         this.queue = queue;
         this.consumer = consumer;
         this.executor = executor;
@@ -79,133 +79,133 @@ public class QueueProcessor<T> implements AutoCloseable {
         this.semaphore = new Semaphore(4, true);
         this.poller = new JobPoller(queue);
         this.globalLock = new ReentrantLock();
-	}
+        }
 
-	/**
-	 * Starts fetching tasks from the Redis queue specified earlier. If no tasks
-	 * are found then the processor sleeps for 500ms before retrying. The processor
-	 * repeats this process unless close method is called on this instance or the
-	 * JVM exists.
-	 *
-	 * @since 0.1
-	 */
-	public void start() {
+        /**
+        * Starts fetching tasks from the Redis queue specified earlier. If no tasks
+        * are found then the processor sleeps for 500ms before retrying. The processor
+        * repeats this process unless close method is called on this instance or the
+        * JVM exists.
+        *
+        * @since 0.1
+        */
+        public void start() {
         try {
             logger.log(Level.INFO, format("Starting queue processing on %s", queue));
 
             for(String json : poller) {
-                	if(executor.isShutdown()) {
-                		break;
-                	}
-                	
-                	try {
-                		logger.info("Finding next thread for task allocation");
-                		semaphore.acquire();
-                		logger.info("Thread found");
-                	} catch(InterruptedException ie) {
-                		logger.log(Level.SEVERE, "", ie);
-                	}
-                	
-                	executor.execute(() -> {
-                		try {
-                			EntityMapper<T> mapper = new EntityMapper<>(model);
-                			final T obj = mapper.parse(json);
-                			consumer.accept(obj);
-                		}
-                		catch(Exception ex) {
-                			logger.log(Level.SEVERE, "", ex);
-                		} 
-                		finally {
-                			semaphore.release();
-                		}
-                	});
+                if(executor.isShutdown()) {
+                    break;
+                }
+
+                try {
+                    logger.info("Finding next thread for task allocation");
+                    semaphore.acquire();
+                    logger.info("Thread found");
+                } catch(InterruptedException ie) {
+                    logger.log(Level.SEVERE, "", ie);
+                }
+
+                executor.execute(() -> {
+                    try {
+                        EntityMapper<T> mapper = new EntityMapper<>(model);
+                        final T obj = mapper.parse(json);
+                        consumer.accept(obj);
+                    }
+                    catch(Exception ex) {
+                        logger.log(Level.SEVERE, "", ex);
+                    } 
+                    finally {
+                        semaphore.release();
+                    }
+                });
             }
             shutdownPool(executor);
         } catch(Exception ex) {
-        	logger.log(Level.SEVERE, "", ex);
-        	throw new RuntimeException(ex);
+            logger.log(Level.SEVERE, "", ex);
+            throw new RuntimeException(ex);
         }
-	}
+        }
 
-	/**
-	 * Stops polling the specified Redis queue and frees up underlying resources.
-	 * All the tasks which were being processed before this method is called will be
-	 * allowed to complete.
-	 *
-	 * @since 0.1
-	 */
-	@Override
-	public void close() {
-		if(isClosed) {
-			return;
-		}
+        /**
+        * Stops polling the specified Redis queue and frees up underlying resources.
+        * All the tasks which were being processed before this method is called will be
+        * allowed to complete.
+        *
+        * @since 0.1
+        */
+        @Override
+        public void close() {
+        if(isClosed) {
+            return;
+        }
 
-		globalLock.lock();
-		try{
-			executor.shutdown();
-			poller.stopPolling();
-		} finally {
-			isClosed = true;
-			globalLock.unlock();
-		}
-	}
+        globalLock.lock();
+        try{
+            executor.shutdown();
+            poller.stopPolling();
+        } finally {
+            isClosed = true;
+            globalLock.unlock();
+        }
+        }
 
-	private void shutdownPool(ExecutorService pool) {
-		try {
-			pool.shutdown();
-			if(!executor.awaitTermination(60L, TimeUnit.SECONDS)) {
-				executor.shutdownNow();
-				executor.awaitTermination(120L, TimeUnit.SECONDS);
-			}
-		} catch(InterruptedException ie) {
+        private void shutdownPool(ExecutorService pool) {
+        try {
+            pool.shutdown();
+            if(!executor.awaitTermination(60L, TimeUnit.SECONDS)) {
+                executor.shutdownNow();
+                executor.awaitTermination(120L, TimeUnit.SECONDS);
+            }
+        } catch(InterruptedException ie) {
 
-		}
-	}
+        }
+        }
 
-	public static class Builder<T> {
+        public static class Builder<T> {
 
-		private final String queue;
+        private final String queue;
 
-		private Consumer<T> consumer;
+        private Consumer<T> consumer;
 
-		private ExecutorService executor;
+        private ExecutorService executor;
 
-		private Logger logger;
+        private Logger logger;
 
-		private int numRetries;
+        private int numRetries;
 
-		private Class<T> model;
+        private Class<T> model;
 
-		public Builder(String queue) {
-			this.queue = queue;
-		}
+        public Builder(String queue) {
+            this.queue = queue;
+        }
 
-		public Builder consumer(Consumer<T> consumer) {
-			this.consumer = consumer;
-			return this;
-		}
+        public Builder consumer(Consumer<T> consumer) {
+            this.consumer = consumer;
+            return this;
+        }
 
-		public Builder executor(ExecutorService executor) {
-			this.executor = executor;
-			return this;
-		}
+        public Builder executor(ExecutorService executor) {
+            this.executor = executor;
+            return this;
+        }
 
-		public Builder retries(int numRetries) {
-			this.numRetries = numRetries;
-			return this;
-		}
+        public Builder retries(int numRetries) {
+            this.numRetries = numRetries;
+            return this;
+        }
 
-		public Builder model(Class<T> model) {
-			this.model = model;
-			return this;
-		}
+        public Builder model(Class<T> model) {
+            this.model = model;
+            return this;
+        }
 
-		public QueueProcessor build() {
-			if(consumer == null) consumer = (v)->{};
-			if(executor == null) executor = Executors.newWorkStealingPool(4);
-			if(model == null) 
-				throw new RuntimeException("Mapping entity is required via a call to model() method of the Builder object.");
-			return new QueueProcessor(queue, consumer, executor, numRetries, model);
-		}
-	}
+        public QueueProcessor build() {
+            if(consumer == null) consumer = (v)->{};
+            if(executor == null) executor = Executors.newWorkStealingPool(4);
+            if(model == null) 
+                throw new RuntimeException("Mapping entity is required via a call to model() method of the Builder object.");
+            return new QueueProcessor(queue, consumer, executor, numRetries, model);
+        }
+        }
 }
