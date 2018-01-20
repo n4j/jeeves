@@ -19,6 +19,13 @@ package io.artofcode;
 import io.artofocde.state.QueueState;
 import java.util.Iterator;
 
+/**
+ * This class exposes an Iterable which which fetches available jobs from the queue.
+ * It is guaranteed that no two workers will fetch the same job ever.
+ *
+ * @author Neeraj Shah
+ * @since 0.1
+ */
 class JobPoller implements Iterable<String> {
 
     private final String queue;
@@ -26,20 +33,25 @@ class JobPoller implements Iterable<String> {
     private JobPollerIterator jobIterator;
 
     public JobPoller(String queue) {
-    	this.queue = queue;
-    	this.jobIterator = new JobPollerIterator();
+        this.queue = queue;
+        this.jobIterator = new JobPollerIterator();
     }
 
     @Override
     public Iterator<String> iterator() {
-    	return jobIterator;
+        return jobIterator;
     }
 
+    /**
+     * This method will be usually called from an external Thread to notify the
+     * poller to stop polling gracefully. The poller may not stop immediately and
+     * a task may be returned before it finally stops.
+     */
     public synchronized void stopPolling() {
-    	jobIterator.stopPolling();
+        jobIterator.stopPolling();
     }
    
-	private class JobPollerIterator implements Iterator<String> {
+    private class JobPollerIterator implements Iterator<String> {
 
         private long workerId;
 
@@ -49,23 +61,24 @@ class JobPoller implements Iterable<String> {
 
         private JobPollerIterator() {
             this.state = new QueueState(queue);
-        	this.workerId = state.getWorkerId();
-        	this.retriver = new QueuedJobRetriver(queue, state.getInprocessQueueName(workerId));
+            this.workerId = state.getWorkerId();
+            this.retriver = new QueuedJobRetriver(queue, state.getInprocessQueueName(workerId));
         }
 
         @Override
-        public boolean hasNext() { 
+        public boolean hasNext() {
+            // Always return true
         	return true; 
         }
 
         @Override
         public String next() {
-        	return retriver.retrieveNext();
+            return retriver.retrieveNext();
         }
 
         private synchronized void stopPolling() {
             retriver.stopPolling();
         }
 
-	}
+    }
 }
