@@ -47,7 +47,7 @@ public class QueueProcessor<T> implements AutoCloseable {
 
 	private ExecutorService executor;
 
-	private Logger logger;
+	private final Logger logger = Logger.getLogger(QueueProcessor.class.toString());
 
 	private int numRetries;
 
@@ -72,21 +72,17 @@ public class QueueProcessor<T> implements AutoCloseable {
 	 */
 	private QueueProcessor(String queue,
 						   Consumer<T> consumer,
-						   String cronExpression,
 						   ExecutorService executor,
-						   Logger logger,
 						   int numRetries,
 						   Class<T> model) {
-		this.queue = queue;
-		this.consumer = consumer;
-		this.cronExpression = cronExpression;
-		this.executor = executor;
-		this.logger = logger;
-		this.numRetries = numRetries;
-		this.model = model;
-		this.semaphore = new Semaphore(4, true);
-		this.poller = new JobPoller(queue, cronExpression, logger);
-		this.globalLock = new ReentrantLock();
+        this.queue = queue;
+        this.consumer = consumer;
+        this.executor = executor;
+        this.numRetries = numRetries;
+        this.model = model;
+        this.semaphore = new Semaphore(4, true);
+        this.poller = new JobPoller(queue);
+        this.globalLock = new ReentrantLock();
 	}
 
 	/**
@@ -98,41 +94,41 @@ public class QueueProcessor<T> implements AutoCloseable {
 	 * @since 0.1
 	 */
 	public void start() {
-		try {
-			logger.log(Level.INFO, format("Starting queue processing on %s", queue));
+        try {
+            logger.log(Level.INFO, format("Starting queue processing on %s", queue));
 
-			for(String json : poller) {
-				if(executor.isShutdown()) {
-					break;
-				}
-				
-				try {
-					logger.info("Finding next thread for task allocation");
-					semaphore.acquire();
-					logger.info("Thread found");
-				} catch(InterruptedException ie) {
-					logger.log(Level.SEVERE, "", ie);
-				}
-				
-				executor.execute(() -> {
-					try {
-						EntityMapper<T> mapper = new EntityMapper<>(model);
-						final T obj = mapper.parse(json);
-						consumer.accept(obj);
-					}
-					catch(Exception ex) {
-						logger.log(Level.SEVERE, "", ex);
-					} 
-					finally {
-						semaphore.release();
-					}
-				});
-			}
-			shutdownPool(executor);
-		} catch(Exception ex) {
-			logger.log(Level.SEVERE, "", ex);
-			throw new RuntimeException(ex);
-		}
+            for(String json : poller) {
+                	if(executor.isShutdown()) {
+                		break;
+                	}
+                	
+                	try {
+                		logger.info("Finding next thread for task allocation");
+                		semaphore.acquire();
+                		logger.info("Thread found");
+                	} catch(InterruptedException ie) {
+                		logger.log(Level.SEVERE, "", ie);
+                	}
+                	
+                	executor.execute(() -> {
+                		try {
+                			EntityMapper<T> mapper = new EntityMapper<>(model);
+                			final T obj = mapper.parse(json);
+                			consumer.accept(obj);
+                		}
+                		catch(Exception ex) {
+                			logger.log(Level.SEVERE, "", ex);
+                		} 
+                		finally {
+                			semaphore.release();
+                		}
+                	});
+            }
+            shutdownPool(executor);
+        } catch(Exception ex) {
+        	logger.log(Level.SEVERE, "", ex);
+        	throw new RuntimeException(ex);
+        }
 	}
 
 	/**
@@ -195,18 +191,8 @@ public class QueueProcessor<T> implements AutoCloseable {
 			return this;
 		}
 
-		public Builder cron(String expression) {
-			this.cronExpression = expression;
-			return this;
-		}
-
 		public Builder executor(ExecutorService executor) {
 			this.executor = executor;
-			return this;
-		}
-
-		public Builder logger(Logger logger) {
-			this.logger = logger;
 			return this;
 		}
 
@@ -222,12 +208,10 @@ public class QueueProcessor<T> implements AutoCloseable {
 
 		public QueueProcessor build() {
 			if(consumer == null) consumer = (v)->{};
-			if(cronExpression == null) cronExpression = "";
 			if(executor == null) executor = Executors.newWorkStealingPool(4);
-			if(logger == null) logger = Logger.getLogger(QueueProcessor.class.toString());
 			if(model == null) 
 				throw new RuntimeException("Mapping entity is required via a call to model() method of the Builder object.");
-			return new QueueProcessor(queue, consumer, cronExpression, executor, logger, numRetries, model);
+			return new QueueProcessor(queue, consumer, executor, numRetries, model);
 		}
 	}
 }

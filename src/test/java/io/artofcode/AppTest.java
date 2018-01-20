@@ -54,7 +54,6 @@ public class AppTest
                     ie.printStackTrace();
                 }
             })
-            .logger(logger)
             .model(ScrapJob.class)
             .retries(5)
             .build();
