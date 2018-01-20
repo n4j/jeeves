@@ -17,7 +17,6 @@ limitations under the License.
 package io.artofcode;
 
 import static java.lang.String.*;
-import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.logging.Logger;
 import java.util.logging.Level;
@@ -32,6 +31,8 @@ import com.google.gson.*;
  * Unit test for simple App.
  */
 public class JsonTest extends TestCase {
+
+    private final Logger logger = Logger.getLogger(JsonTest.class.toString());
 
 	public JsonTest(String testName) {
 		super(testName);
@@ -59,5 +60,4 @@ public class JsonTest extends TestCase {
     	logger.log( Level.INFO, job.toString() );
     }
 
-    private final Logger logger = Logger.getLogger(JsonTest.class.toString());
 }

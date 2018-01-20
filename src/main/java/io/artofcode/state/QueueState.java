@@ -21,7 +21,6 @@ import io.artofcode.state.StatePersistenceManager;
 
 import static java.lang.String.*;
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Class to provide vital information for a job to execute and maintain consistent state

@@ -52,6 +52,8 @@ public class StatePersistenceManager {
 
 	private final String stateDirPath;
 
+	private final Logger logger = Logger.getLogger(StatePersistenceManager.class.toString());
+
 	private StatePersistenceManager() {
 		String userHome = System.getProperty("user.home");
 		this.stateDirPath = ((userHome == null || userHome.equals("")) ? 
@@ -165,6 +167,4 @@ public class StatePersistenceManager {
 	String getStateDirPath() {
 		return this.stateDirPath;
 	}
-
-	private final Logger logger = Logger.getLogger(StatePersistenceManager.class.toString());
 }

@@ -17,10 +17,6 @@ limitations under the License.
 package io.artofcode;
 
 import static java.lang.String.*;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.logging.Logger;
-import java.util.logging.Level;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -51,16 +47,15 @@ public class EntityMapperTest extends TestCase {
 	}
 
 	public void testModelRequired() {
+		QueueProcessor processor;
 		try {
-			final QueueProcessor processor = new QueueProcessor.Builder<ScrapJob>("crawlers:url")
+			processor = new QueueProcessor.Builder<ScrapJob>("crawlers:url")
 							.consumer((job) -> {})
 							.build();
 		} catch(RuntimeException re) {
-			assertTrue(true);
+			assertTrue(re != null);
 			return;
 		}
-		assertTrue(false);
+		assertTrue(processor != null);
 	}
-
-	private final Logger logger = Logger.getLogger(EntityMapperTest.class.toString());
 }
