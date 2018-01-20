@@ -15,11 +15,16 @@ limitations under the License.
 */
 
 package io.artofcode;
+
 import static java.lang.String.*;
 import redis.clients.jedis.*;
 
-public class RedisQueueManager 
-	implements AutoCloseable {
+/**
+ * Wrapper class for Redis client. Provides utility method to create queue specific unique worker-ids
+ *
+ * @since 0.1
+ */
+public class RedisQueueManager implements AutoCloseable {
 
 	private final String queue;
 
@@ -32,6 +37,10 @@ public class RedisQueueManager
 
 	public String get() {
 		return jedis.lpop(queue);
+	}
+
+	public String brpoplpush(String destination, int timeout) {
+		return jedis.brpoplpush(queue, destination, timeout);
 	}
 
 	/**

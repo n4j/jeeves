@@ -19,6 +19,7 @@ package io.artofocde.state;
 import io.artofcode.RedisQueueManager;
 import io.artofcode.state.StatePersistenceManager;
 
+import static java.lang.String.*;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -37,6 +38,8 @@ public class QueueState {
 	private final Map<String, String> state;
 
 	private static final String WORKER_ID = "worker-id";
+
+	private static final String INPROCESS_QUEUE_SUFFIX = "processing";
 
 	public QueueState(String queue) {
 		this.queue = queue;
@@ -80,7 +83,7 @@ public class QueueState {
 	 * same task and tasks are persisted in case a worker instance fails and restarts
 	 *
 	 */
-	public String getInprocessQueueName() {
-		return "";
+	public String getInprocessQueueName(long workerId) {
+		return format("%d:%s:%s", workerId, queue, INPROCESS_QUEUE_SUFFIX);
 	}
 }
