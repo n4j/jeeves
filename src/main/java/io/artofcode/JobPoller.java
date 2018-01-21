@@ -68,7 +68,7 @@ class JobPoller implements Iterable<String> {
         @Override
         public boolean hasNext() {
             // Always return true
-        	return true; 
+            return true; 
         }
 
         @Override

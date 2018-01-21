@@ -21,6 +21,14 @@ import io.artofcode.RedisQueueManager;
 import static java.lang.String.*;
 import java.util.logging.Logger;
 
+/**
+ * Retrives queued jobs from the specified queue and moves it to worker specific
+ * in-process queue. This operation is atomic and hence it is guaranteed that no
+ * two workers will pickup same job for processing. 
+ *
+ * @author Neeraj Shah
+ * @since 0.1
+ */
 class QueuedJobRetriver {
 
     private final RedisQueueManager rqm;
@@ -41,6 +49,15 @@ class QueuedJobRetriver {
         this.rqm = new RedisQueueManager(queue);
     }
 
+    /**
+     * Retrieves next available job from the queue, before the job is returned it is moved
+     * to an in process queue. If no jobs are available in the specified queue then this 
+     * method blocks for WAIT_TIMEOUT seconds. After WAIT_TIMEOUT elapses it retries again.
+     * This continues infinetly until the JVM exists or JobPoller classes' stopPolling() method
+     * is called.
+     *
+     * @return raw string payload
+     */
     public String retrieveNext() {
         String payload = null;
         while(continuePolling && payload == null) {
