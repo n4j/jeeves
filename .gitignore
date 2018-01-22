@@ -23,3 +23,5 @@ hs_err_pid*
 *.rdb
 
 .DS_Store
+.idea
+target
