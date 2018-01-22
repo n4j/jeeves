@@ -16,7 +16,7 @@ limitations under the License.
 
 package io.artofcode;
 
-import io.artofocde.state.QueueState;
+import io.artofocde.state.WorkerState;
 import java.util.Iterator;
 
 /**
@@ -55,12 +55,12 @@ class JobPoller implements Iterable<String> {
 
         private long workerId;
 
-        private QueueState state;
+        private WorkerState state;
 
         private final QueuedJobRetriver retriver;
 
         private JobPollerIterator() {
-            this.state = new QueueState(queue);
+            this.state = new WorkerState(queue);
             this.workerId = state.getWorkerId();
             this.retriver = new QueuedJobRetriver(queue, state.getInprocessQueueName(workerId));
         }
