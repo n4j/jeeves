@@ -40,19 +40,19 @@ public class QueueProcessor<T> implements AutoCloseable {
 
         private final String queue;
 
-        private Consumer<T> consumer;
+        private final Consumer<T> consumer;
 
-        private ExecutorService executor;
+        private final ExecutorService executor;
 
         private final Logger logger = Logger.getLogger(QueueProcessor.class.toString());
 
-        private int numRetries;
+        private final int numRetries;
 
-        private JobPoller poller;
+        private final JobPoller poller;
 
         private volatile boolean isClosed = false;
 
-        private Class<T> model;
+        private final Class<T> model;
 
         private final Semaphore semaphore;
 
@@ -185,8 +185,6 @@ public class QueueProcessor<T> implements AutoCloseable {
 
             private ExecutorService executor;
 
-            private Logger logger;
-
             private int numRetries;
 
             private Class<T> model;
@@ -215,12 +213,12 @@ public class QueueProcessor<T> implements AutoCloseable {
                 return this;
             }
 
-            public QueueProcessor build() {
+            public QueueProcessor<T> build() {
                 if(consumer == null) consumer = (v)->{};
                 if(executor == null) executor = Executors.newWorkStealingPool(4);
                 if(model == null) 
                     throw new RuntimeException("Mapping entity is required via a call to model() method of the Builder object.");
-                return new QueueProcessor(queue, consumer, executor, numRetries, model);
+                return new QueueProcessor<T>(queue, consumer, executor, numRetries, model);
             }
         }
 }

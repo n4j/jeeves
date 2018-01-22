@@ -30,7 +30,7 @@ class JobPoller implements Iterable<String> {
 
     private final String queue;
 
-    private JobPollerIterator jobIterator;
+    private final JobPollerIterator jobIterator;
 
     public JobPoller(String queue) {
         this.queue = queue;
@@ -53,23 +53,20 @@ class JobPoller implements Iterable<String> {
    
     private class JobPollerIterator implements Iterator<String> {
 
-        private long workerId;
+        private final long workerId;
 
-        private WorkerState state;
+        private final WorkerState state;
 
-        private final QueuedJobRetriver retriver;
+        private final QueuedJobRetriever retriver;
 
         private JobPollerIterator() {
             this.state = new WorkerState(queue);
             this.workerId = state.getWorkerId();
-            this.retriver = new QueuedJobRetriver(queue, state.getInprocessQueueName(workerId));
+            this.retriver = new QueuedJobRetriever(queue, state.getInprocessQueueName(workerId));
         }
 
         @Override
-        public boolean hasNext() {
-            // Always return true
-            return true; 
-        }
+        public boolean hasNext() { return true; }
 
         @Override
         public String next() {

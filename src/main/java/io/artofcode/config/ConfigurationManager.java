@@ -26,7 +26,7 @@ import java.util.Properties;
 
 public class ConfigurationManager {
 
-    private static String[] configKeys = {
+    private static final String[] configKeys = {
        "NUM_RETRIES",
        "REDIS_HOST",
        "REDIS_PORT" , 
@@ -39,7 +39,8 @@ public class ConfigurationManager {
 
     static {
         synchronized(ConfigurationManager.class) {
-
+            instance = new ConfigurationManager();
+            loadConfigProperties();
         }
     }
 
@@ -48,6 +49,11 @@ public class ConfigurationManager {
     }
 
     public Map<String, String> get(String configName) {
+        if(properties.containsKey(configName)){
+            return new HashMap<>(
+                    properties.get(configName)
+            );
+        }
         return null;
     }
 
@@ -96,7 +102,7 @@ public class ConfigurationManager {
         }
 
         try {
-            defaultProps.load(new FileReader(path + separator + "default.yaml"));
+            defaultProps.load(new FileReader(path + separator + "default"));
         } catch(IOException ioe) {
             throw new RuntimeException(ioe);
         }
@@ -130,5 +136,9 @@ public class ConfigurationManager {
         if(lastDot == -1)
             return file;
         return file.substring(0, lastDot);
+    }
+
+    private ConfigurationManager readResolve() {
+        return instance;
     }
 }

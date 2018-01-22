@@ -38,17 +38,15 @@ import java.util.Properties;
  */
 public class StatePersistenceManager {
 
-	private static StatePersistenceManager instance;
+	private static final StatePersistenceManager instance;
 
 	static {
-		if(instance == null) {
 			synchronized(StatePersistenceManager.class) {
 				instance = new StatePersistenceManager();
 			}
-		}
 	}
 
-	private final String stateDirName = ".state";
+	private static final String stateDirName = ".state";
 
 	private final String stateDirPath;
 
