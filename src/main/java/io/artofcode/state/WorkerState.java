@@ -30,7 +30,7 @@ import java.util.Map;
  * @author  Neeraj Shah
  * @since   0.1
  */
-public class QueueState {
+public class WorkerState {
 
 	private final String queue;
 
@@ -40,7 +40,7 @@ public class QueueState {
 
 	private static final String INPROCESS_QUEUE_SUFFIX = "processing";
 
-	public QueueState(String queue) {
+	public WorkerState(String queue) {
 		this.queue = queue;
 		this.state = StatePersistenceManager.getInstance().getState(queue);
 	}
