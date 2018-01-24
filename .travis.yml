@@ -7,6 +7,9 @@ services: redis-server
 addons:
   sonarcloud:
     organization: "n4j-github"
+  branches:
+      - master
+      - n4j/sonar-support
 
 cache:
   directories:
