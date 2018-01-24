@@ -4,5 +4,12 @@ jdk: oraclejdk8
 
 services: redis-server
 
+addons:
+  sonarcloud:
+    organization: "n4j-github"
+
+script:
+  - sonar-scanner
+
 after_success:
   - bash <(curl -s https://codecov.io/bash)
