@@ -45,7 +45,7 @@ public class AppTest
 
     public void testBasic()
     {
-        final QueueProcessor processor = new QueueProcessor.Builder<ScrapJob>("crawlers:url")
+        final QueueProcessor<ScrapJob> processor = new QueueProcessor.Builder<ScrapJob>("crawlers:url")
             .consumer((url)->{
                 ThreadLocalRandom random = ThreadLocalRandom.current();
                 logger.log(Level.INFO, format("[Object %d]: Processing url %s", this.hashCode(), url.getUrl()));
