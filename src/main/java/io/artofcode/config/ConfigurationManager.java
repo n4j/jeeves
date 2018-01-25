@@ -40,12 +40,16 @@ public class ConfigurationManager {
     static {
         synchronized(ConfigurationManager.class) {
             instance = new ConfigurationManager();
-            loadConfigProperties();
+            properties = loadConfigProperties();
         }
     }
 
     private ConfigurationManager() {
 
+    }
+
+    public static ConfigurationManager getInstance() {
+        return instance;
     }
 
     public Map<String, String> get(String configName) {
@@ -138,7 +142,9 @@ public class ConfigurationManager {
         return file.substring(0, lastDot);
     }
 
+    @SuppressWarnings("unused")
     private ConfigurationManager readResolve() {
+
         return instance;
     }
 }

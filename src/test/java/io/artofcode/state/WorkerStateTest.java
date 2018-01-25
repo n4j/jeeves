@@ -16,7 +16,7 @@ limitations under the License.
 
 package io.artofcode.state;
 
-import io.artofocde.state.WorkerState;
+import io.artofcode.state.WorkerState;
 
 import static java.lang.String.*;
 import java.util.concurrent.ThreadLocalRandom;

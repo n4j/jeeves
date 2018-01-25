@@ -16,7 +16,7 @@ limitations under the License.
 
 package io.artofcode;
 
-import io.artofocde.state.WorkerState;
+import io.artofcode.state.WorkerState;
 import java.util.Iterator;
 
 /**

@@ -42,6 +42,35 @@
         </configuration>
       </plugin>
 
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-resources-plugin</artifactId>
+            <version>3.0.2</version>
+            <!--<executions>
+                <execution>
+                    <id>copy-resources</id>
+                    &lt;!&ndash; here the phase you need &ndash;&gt;
+                    <phase>validate</phase>
+                    <goals>
+                        <goal>copy-resources</goal>
+                    </goals>
+                    <configuration>
+                        <addDefaultExcludes>true</addDefaultExcludes>
+                        <outputDirectory>${basedir}/target/extra-resources</outputDirectory>
+                        <fileNameFiltering>true</fileNameFiltering>
+                        <resources>
+                            <resource>
+                                <directory>src/test/java/io/artofcode/config</directory>
+                                <excludes>
+                                    <exclude>*.java</exclude>
+                                </excludes>
+                            </resource>
+                        </resources>
+                    </configuration>
+                </execution>
+            </executions>-->
+        </plugin>
+
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>
