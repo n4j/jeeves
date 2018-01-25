@@ -24,6 +24,8 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ConfigurationManager {
 
@@ -38,10 +40,17 @@ public class ConfigurationManager {
 
     private static Map<String, Map<String, String>> properties;
 
+    private static Logger logger = Logger.getLogger(ConfigurationManager.class.toString());
+
     static {
         synchronized(ConfigurationManager.class) {
-            instance = new ConfigurationManager();
-            properties = loadConfigProperties();
+            validateConfigPath();
+            try {
+                instance = new ConfigurationManager();
+                properties = loadConfigProperties();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -55,11 +64,9 @@ public class ConfigurationManager {
 
     public Map<String, String> get(String configName) {
         if(properties.containsKey(configName)){
-            return new HashMap<>(
-                    properties.get(configName)
-            );
+            return new HashMap<>(properties.get(configName));
         }
-        return null;
+        return new HashMap<>(properties.get("default"));
     }
 
     private static Map<String, Map<String, String>> loadConfigProperties() {
@@ -118,7 +125,8 @@ public class ConfigurationManager {
         try {
             defaultProps.load(new FileReader(path + separator + "default"));
         } catch(IOException ioe) {
-            throw new RuntimeException(ioe);
+            logger.info(String.format("Unable to find default configuration file at %s", path));
+            logger.log(Level.INFO, "IOException while loading default configuration", ioe);
         }
 
         return defaultProps;
@@ -155,6 +163,13 @@ public class ConfigurationManager {
         if(lastDot == -1)
             return file;
         return file.substring(0, lastDot);
+    }
+
+    private static void validateConfigPath() {
+        String configPath = getDefaultConfigPath();
+        if(configPath == null)
+            throw new RuntimeException("JEEVES_CONFIG variable not set, JEEVES_CONFIG must point to a directory"+
+                    "containing configuration files for Jeeves. It can be set via environment variable or via -D option");
     }
 
     @SuppressWarnings("unused")

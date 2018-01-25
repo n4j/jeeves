@@ -17,16 +17,11 @@ limitations under the License.
 package io.artofcode.config;
 
 import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.attribute.FileAttribute;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import static java.lang.String.format;
 
+import io.artofcode.TestHelper;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -39,10 +34,8 @@ public class ConfigurationManagerTest extends TestCase {
 
     public ConfigurationManagerTest( String testName ) throws IOException {
         super( testName );
-        Path configDir = Files.createTempDirectory(CONFIG_PATH, new FileAttribute[0]);
-        setupEnvironment(configDir);
-        copyConfigFile(configDir, "default");
-        copyConfigFile(configDir, "url-crawlers");
+
+        TestHelper.setupEnvironment();
     }
 
     public static Test suite() {
@@ -69,26 +62,6 @@ public class ConfigurationManagerTest extends TestCase {
         assertTrue(defaultProps.get("REDIS_HOST").equals("ec2-10-10-142-132.aws.amazon.com"));
         assertTrue(defaultProps.get("REDIS_PORT").equals("6379"));
         assertTrue(defaultProps.get("HEART_BEAT").equals("2500s"));
-    }
-
-    private void setupEnvironment(Path configDir) {
-            System.setProperty("JEEVES_CONFIG", configDir.toString());
-    }
-
-    private void copyConfigFile(Path configDir, String configFileName) {
-        try {
-            URL configURL = getClass().getClassLoader().getResource(configFileName);
-            if(configURL == null) {
-                logger.severe(format("Unable to locate config file %s. Tests will not pass.", configFileName));
-            } else {
-                logger.info(format("Config directory is %s", configDir.toString()));
-                Path configPath = Paths.get(configDir.toString(), configFileName);
-                Files.copy(configURL.openStream(), configPath);
-                logger.info(format("Config file is %s", configPath.toString()));
-            }
-        }catch(NullPointerException | IOException e) {
-            logger.log(Level.SEVERE, format("Error while copying resources to path %s", configDir), e);
-        }
     }
 
 }

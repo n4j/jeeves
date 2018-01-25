@@ -16,9 +16,13 @@ limitations under the License.
 
 package io.artofcode.state;
 
+import io.artofcode.TestHelper;
 import io.artofcode.state.WorkerState;
 
 import static java.lang.String.*;
+
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.concurrent.ThreadLocalRandom;
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -26,8 +30,11 @@ import junit.framework.TestSuite;
 
 public class WorkerStateTest extends TestCase {
 
-	public WorkerStateTest(String testSuiteName) {
+    private static final String QUEUE_NAME = "url-crawlers-test";
+
+	public WorkerStateTest(String testSuiteName) throws IOException {
 		super(testSuiteName);
+        TestHelper.setupEnvironment();
 	}
 
 	public static Test suite() {
@@ -35,23 +42,20 @@ public class WorkerStateTest extends TestCase {
     }
 
     public void testWorkerId() {
-    	ThreadLocalRandom random = ThreadLocalRandom.current();
-    	WorkerState workerFirstRun = new WorkerState(format("queue-%d", random.nextInt()));
-    	assertTrue( workerFirstRun.getWorkerId() == 1L );
+    	WorkerState workerFirstRun = new WorkerState(QUEUE_NAME);
+    	long workerId = workerFirstRun.getWorkerId();
+    	assertTrue( workerId > 0 );
 
-    	WorkerState workerSecondRun = new WorkerState(format("queue-%d", random.nextInt()));
-    	assertTrue( workerSecondRun.getWorkerId() == 1L );
+    	WorkerState workerSecondRun = new WorkerState(QUEUE_NAME);
+    	assertTrue( workerSecondRun.getWorkerId() == workerId );
     }
 
     public void testInProcessQueueName() {
-    	ThreadLocalRandom random = ThreadLocalRandom.current();
-    	String queueName = format("queue-%d", random.nextInt());
-    	WorkerState workerState = new WorkerState(queueName);
-    	
+    	WorkerState workerState = new WorkerState(QUEUE_NAME);
     	long workerId = workerState.getWorkerId();
 
     	assertTrue(workerState.getInprocessQueueName(workerId).equals(
-    		format("%d:%s:%s", workerId, queueName, "processing")
+    		format("%d:%s:%s", workerId, QUEUE_NAME, "processing")
     	));
     }
 

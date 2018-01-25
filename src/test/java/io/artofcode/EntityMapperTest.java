@@ -24,13 +24,19 @@ import junit.framework.TestSuite;
 
 import com.google.gson.*;
 
+import java.io.IOException;
+import java.nio.file.Path;
+
 /**
  * Unit test for simple App.
  */
 public class EntityMapperTest extends TestCase {
 
-    public EntityMapperTest(String testName) {
+    private static final String QUEUE_NAME = "url-crawlers-test";
+
+    public EntityMapperTest(String testName) throws IOException {
         super(testName);
+        TestHelper.setupEnvironment();
     }
 
     public static Test suite() {
@@ -38,7 +44,7 @@ public class EntityMapperTest extends TestCase {
     }
 
     public void testBasic() {
-        final QueueProcessor processor = new QueueProcessor.Builder<ScrapJob>("crawlers:url")
+        final QueueProcessor processor = new QueueProcessor.Builder<ScrapJob>(QUEUE_NAME)
                         .model(ScrapJob.class)
                         .consumer((job) -> {})
                         .build();
@@ -49,7 +55,7 @@ public class EntityMapperTest extends TestCase {
     public void testModelRequired() {
         QueueProcessor processor;
         try {
-            processor = new QueueProcessor.Builder<ScrapJob>("crawlers:url")
+            processor = new QueueProcessor.Builder<ScrapJob>(QUEUE_NAME)
                             .consumer((job) -> {})
                             .build();
         } catch(RuntimeException re) {
