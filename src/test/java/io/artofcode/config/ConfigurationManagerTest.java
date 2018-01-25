@@ -37,48 +37,57 @@ public class ConfigurationManagerTest extends TestCase {
 
     private final Logger logger = Logger.getLogger(ConfigurationManagerTest.class.toString());
 
-    public ConfigurationManagerTest( String testName ) {
+    public ConfigurationManagerTest( String testName ) throws IOException {
         super( testName );
-        setupEnvironment();
+        Path configDir = Files.createTempDirectory(CONFIG_PATH, new FileAttribute[0]);
+        setupEnvironment(configDir);
+        copyConfigFile(configDir, "default");
+        copyConfigFile(configDir, "url-crawlers");
     }
 
     public static Test suite() {
-
         return new TestSuite( ConfigurationManagerTest.class );
     }
 
-    public void testBasic() {
+    public void testDefaultConfig() {
         ConfigurationManager configManager = ConfigurationManager.getInstance();
         assertTrue(configManager != null);
 
         Map<String, String> defaultProps = configManager.get("default");
-
         assertTrue(defaultProps.get("NUM_RETRIES").equals("5"));
         assertTrue(defaultProps.get("REDIS_HOST").equals("localhost"));
         assertTrue(defaultProps.get("REDIS_PORT").equals("6379"));
         assertTrue(defaultProps.get("HEART_BEAT").equals("5000s"));
     }
 
-    private void setupEnvironment() {
+    public void testOverlappingConfig() {
+        ConfigurationManager configManager = ConfigurationManager.getInstance();
+        assertTrue(configManager != null);
+
+        Map<String, String> defaultProps = configManager.get("url-crawlers");
+        assertTrue(defaultProps.get("NUM_RETRIES").equals("5"));
+        assertTrue(defaultProps.get("REDIS_HOST").equals("ec2-10-10-142-132.aws.amazon.com"));
+        assertTrue(defaultProps.get("REDIS_PORT").equals("6379"));
+        assertTrue(defaultProps.get("HEART_BEAT").equals("2500s"));
+    }
+
+    private void setupEnvironment(Path configDir) {
+            System.setProperty("JEEVES_CONFIG", configDir.toString());
+    }
+
+    private void copyConfigFile(Path configDir, String configFileName) {
         try {
-
-            Path configDir =  Files.createTempDirectory(CONFIG_PATH, new FileAttribute[0]);
-            URL configURL = getClass().getClassLoader().getResource("default");
-
+            URL configURL = getClass().getClassLoader().getResource(configFileName);
             if(configURL == null) {
-                logger.severe("Unable to locate 'default' configuration file. Tests will not pass.");
+                logger.severe(format("Unable to locate config file %s. Tests will not pass.", configFileName));
             } else {
                 logger.info(format("Config directory is %s", configDir.toString()));
-
-                Path configPath = Paths.get(configDir.toString(), "default");
+                Path configPath = Paths.get(configDir.toString(), configFileName);
                 Files.copy(configURL.openStream(), configPath);
-
-                System.setProperty("JEEVES_CONFIG", configDir.toString());
-
                 logger.info(format("Config file is %s", configPath.toString()));
             }
         }catch(NullPointerException | IOException e) {
-            logger.log(Level.SEVERE, "Error while copying resources to default CONFIG_PATH", e);
+            logger.log(Level.SEVERE, format("Error while copying resources to path %s", configDir), e);
         }
     }
 

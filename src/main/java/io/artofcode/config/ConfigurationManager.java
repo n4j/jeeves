@@ -20,6 +20,7 @@ import static java.io.File.*;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -69,16 +70,25 @@ public class ConfigurationManager {
         File configDir = new File(configPath);
         File[] files = configDir.listFiles((file) -> file.isFile());
         
-        Properties defaultProperty = getDefaultConfig();
+        Properties defaultProperties = getDefaultConfig();
+        allProperties.put("default", propsToMap(defaultProperties));
 
         for(int i = 0; i<files.length; i++) {
-            Properties property = new Properties(defaultProperty);
+
+            // Skip over default config file as we have already loaded it
+            if(files[i].equals("default")) {
+                continue;
+            }
+
+            Properties property = new Properties(defaultProperties);
             try {
-                property.load(new FileReader(files[i]));
-                allProperties.put(
-                    removeExtension(files[i].getName()),
-                    propsToMap(property)
-                );
+                try(FileReader reader = new FileReader(files[i])) {
+                    property.load(new FileReader(files[i]));
+                    allProperties.put(
+                            removeExtension(files[i].getName()),
+                            propsToMap(property)
+                    );
+                }
             } catch(IOException ioe) {
                 continue;
             }
@@ -129,9 +139,14 @@ public class ConfigurationManager {
     private static Map<String, String> propsToMap(Properties properties) {
         Map<String, String> propsMap = new HashMap<>();
 
-        for(Map.Entry<Object, Object> property : properties.entrySet()) {
-            propsMap.put(property.getKey().toString(), property.getValue().toString());
+        // Have to do it this way because Properties.entrySet() doesn't
+        // return default properties, which is crucial for us.
+        Enumeration<?> keyNames = properties.propertyNames();
+        while(keyNames.hasMoreElements()){
+            String keyName = keyNames.nextElement().toString();
+            propsMap.put(keyName, properties.getProperty(keyName));
         }
+
         return propsMap;
     }
 
