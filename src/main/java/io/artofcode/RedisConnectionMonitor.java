@@ -74,13 +74,13 @@ class RedisConnectionMonitor {
              retryCount++) {
 
             try {
-                logger.info(format("Attempting re-connection %2d/%2d", (retryCount + 1), maxRetries));
+                logger.info(format("Attempting re-connection %2d /%2d", (retryCount + 1), maxRetries));
                 client.connect();
             } catch (JedisConnectionException jce) {
 
-                /* If we have attempted re-connection for maxRetries then give up and throw the exception
-                   to the client
-                 */
+                /**
+                 * If we have attempted re-connection for maxRetries then give up and throw the exception to the client
+                 **/
                 if ((retryCount + 1) == maxRetries) {
                     throw new RuntimeException(jce);
                 }
