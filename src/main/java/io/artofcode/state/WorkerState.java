@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package io.artofocde.state;
+package io.artofcode.state;
 
 import io.artofcode.RedisQueueManager;
 import io.artofcode.state.StatePersistenceManager;

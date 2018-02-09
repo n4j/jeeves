@@ -16,8 +16,6 @@ limitations under the License.
 
 package io.artofcode;
 
-import io.artofcode.RedisQueueManager;
-
 import static java.lang.String.*;
 import java.util.logging.Logger;
 
@@ -29,23 +27,23 @@ import java.util.logging.Logger;
  * @author Neeraj Shah
  * @since 0.1
  */
-class QueuedJobRetriver {
+class QueuedJobRetriever {
 
     private final RedisQueueManager rqm;
 
     private final String queue;
 
-    private final String inprocessQueue;
+    private final String inProcessQueue;
 
     private static final int WAIT_TIMEOUT = 10;
 
     private volatile boolean continuePolling = true;
 
-    private final Logger logger = Logger.getLogger(QueuedJobRetriver.class.toString());
+    private final Logger logger = Logger.getLogger(QueuedJobRetriever.class.toString());
 
-    QueuedJobRetriver(String queue, String inprocessQueue) {
+    QueuedJobRetriever(String queue, String inProcessQueue) {
         this.queue = queue;
-        this.inprocessQueue = inprocessQueue;
+        this.inProcessQueue = inProcessQueue;
         this.rqm = new RedisQueueManager(queue);
     }
 
@@ -53,7 +51,7 @@ class QueuedJobRetriver {
      * Retrieves next available job from the queue, before the job is returned it is moved
      * to an in process queue. If no jobs are available in the specified queue then this 
      * method blocks for WAIT_TIMEOUT seconds. After WAIT_TIMEOUT elapses it retries again.
-     * This continues infinetly until the JVM exists or JobPoller classes' stopPolling() method
+     * This continues infinitely until the JVM exists or JobPoller classes' stopPolling() method
      * is called.
      *
      * @return raw string payload
@@ -62,7 +60,7 @@ class QueuedJobRetriver {
         String payload = null;
         while(continuePolling && payload == null) {
             logger.info(format("Polling job from queue %s with wait timeout %d", queue, WAIT_TIMEOUT));
-            payload = rqm.brpoplpush(inprocessQueue, WAIT_TIMEOUT);
+            payload = rqm.brpoplpush(inProcessQueue, WAIT_TIMEOUT);
         }
         return payload;
     }

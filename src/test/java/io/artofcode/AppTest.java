@@ -17,6 +17,8 @@ limitations under the License.
 package io.artofcode;
 
 import static java.lang.String.*;
+
+import java.io.IOException;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -33,9 +35,11 @@ public class AppTest
 {
     private final Logger logger = Logger.getLogger(AppTest.class.toString());
 
-    public AppTest( String testName )
-    {
+    private static final String QUEUE_NAME = "url-crawlers-test";
+
+    public AppTest( String testName ) throws IOException {
         super( testName );
+        TestHelper.setupEnvironment();
     }
 
     public static Test suite()
@@ -45,7 +49,7 @@ public class AppTest
 
     public void testBasic()
     {
-        final QueueProcessor processor = new QueueProcessor.Builder<ScrapJob>("crawlers:url")
+        final QueueProcessor<ScrapJob> processor = new QueueProcessor.Builder<ScrapJob>(QUEUE_NAME)
             .consumer((url)->{
                 ThreadLocalRandom random = ThreadLocalRandom.current();
                 logger.log(Level.INFO, format("[Object %d]: Processing url %s", this.hashCode(), url.getUrl()));

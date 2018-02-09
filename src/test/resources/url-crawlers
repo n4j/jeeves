@@ -1,0 +1,2 @@
+REDIS_HOST=ec2-10-10-142-132.aws.amazon.com
+HEART_BEAT=2500s

@@ -17,7 +17,11 @@ limitations under the License.
 package io.artofcode;
 
 import static java.lang.String.*;
+
+import io.artofcode.config.ConfigurationManager;
 import redis.clients.jedis.*;
+
+import java.util.Map;
 
 /**
  * Wrapper class for Redis client. Provides utility method to create queue specific unique worker-ids
@@ -32,7 +36,8 @@ public class RedisQueueManager implements AutoCloseable {
 
     public RedisQueueManager(String queue) {
         this.queue = queue;
-        this.jedis = new Jedis("localhost");
+        Map<String, String> configuration = ConfigurationManager.getInstance().get(queue);
+        this.jedis = new Jedis(configuration.get("REDIS_HOST"));
     }
 
     public String get() {

@@ -23,3 +23,7 @@ hs_err_pid*
 *.rdb
 
 .DS_Store
+.idea
+target
+jeeves.iml
+src/test/java/io/artofcode/TestHelper.java
