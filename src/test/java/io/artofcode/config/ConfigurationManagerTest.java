@@ -26,11 +26,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 public class ConfigurationManagerTest extends TestCase {
-
-    private final static String CONFIG_PATH = "config";
-
-    private final Logger logger = Logger.getLogger(ConfigurationManagerTest.class.toString());
-
+    
     public ConfigurationManagerTest( String testName ) throws IOException {
         super( testName );
 
