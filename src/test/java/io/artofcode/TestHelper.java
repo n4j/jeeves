@@ -1,7 +1,5 @@
 package io.artofcode;
 
-import junit.framework.Test;
-
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;

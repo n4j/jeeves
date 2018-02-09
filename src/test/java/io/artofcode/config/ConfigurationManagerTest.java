@@ -26,7 +26,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 public class ConfigurationManagerTest extends TestCase {
-    
+
     public ConfigurationManagerTest( String testName ) throws IOException {
         super( testName );
 
