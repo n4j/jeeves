@@ -72,28 +72,37 @@ class RedisConnectionMonitor {
 
     private void checkAndReconnect() {
         for (int retryCount = 0; retryCount < maxRetries; retryCount++) {
-
             try {
                 logger.info(format("Attempting re-connection %2d /%2d", (retryCount + 1), maxRetries));
                 client.connect();
+                if(client.isConnected())
+                    break;
+                else
+                    shouldRetryConnection(retryCount, null);
             } catch (JedisConnectionException jce) {
-
-                /**
-                 * If we have attempted re-connection for maxRetries then give up and throw the exception to the client
-                 **/
-                if ((retryCount + 1) == maxRetries) {
-                    throw new RuntimeException(jce);
-                }
-
-                logger.log(Level.SEVERE, "Connection attempt failed", jce);
-                logger.info("Retrying after 1000ms");
-
-                try {
-                    Thread.sleep(1000L);
-                } catch (InterruptedException ie) {
-                    logger.log(Level.SEVERE, "InterruptedException swallowed", ie);
-                }
+                shouldRetryConnection(retryCount, jce);
             }
+        }
+    }
+
+    private void shouldRetryConnection(int retryCount, JedisConnectionException jce) {
+        /**
+         * If we have attempted re-connection for maxRetries then give up and throw the exception to the client
+         **/
+        if ((retryCount + 1) == maxRetries) {
+            if(jce != null)
+                throw new RuntimeException(jce);
+            else
+                throw new RuntimeException("Failed to connect to Redis server. Givign up retries.");
+        }
+
+        logger.log(Level.SEVERE, "Connection attempt failed", jce);
+        logger.info("Retrying after 1000ms");
+
+        try {
+            Thread.sleep(1000L);
+        } catch (InterruptedException ie) {
+            logger.log(Level.SEVERE, "InterruptedException swallowed", ie);
         }
     }
 }
