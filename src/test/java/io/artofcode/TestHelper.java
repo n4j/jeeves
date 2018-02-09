@@ -16,7 +16,7 @@ import static java.lang.String.format;
 public class TestHelper {
 
     private final static String CONFIG_PATH = "config";
-    
+
     private static Logger logger;
 
     static {
