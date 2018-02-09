@@ -56,23 +56,21 @@ class RedisConnectionMonitor {
      * @throws RuntimeException
      */
     public <T> T invoke(Callable<T> action) {
-        if(invokedFirstCall)
-            checkAndReconnect();
-        else
-            invokedFirstCall = true;
-
-        try {
-            return action.call();
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
+        /**
+         * This is not an infinite loop. Trust me on this!!!
+         * */
+        while(true) {
+            try {
+                return action.call();
+            } catch (JedisConnectionException jce) {
+                checkAndReconnect();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 
     private void checkAndReconnect() {
-        if(client.isConnected()) {
-            logger.info("Client connected, re-connection not required.");
-            return;
-        }
         for (int retryCount = 0; retryCount < maxRetries; retryCount++) {
 
             try {
