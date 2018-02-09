@@ -56,25 +56,32 @@ class RedisConnectionMonitor {
      * @throws RuntimeException
      */
     public <T> T invoke(Callable<T> action) {
-        /**
-         * This is not an infinite loop. Trust me on this!!!
-         * */
-        while(true) {
             try {
                 return action.call();
-            } catch (JedisConnectionException jce) {
-                checkAndReconnect();
             } catch (Exception ex) {
-                throw new RuntimeException(ex);
+                logger.log(Level.SEVERE, "Error while calling Jedis client, reconnection will be attempted", ex);
+                checkAndReconnect();
+                try {
+                    return action.call();
+                }catch (Exception ex2) {
+                    throw new RuntimeException(ex2);
+                }
             }
-        }
     }
 
     private void checkAndReconnect() {
         for (int retryCount = 0; retryCount < maxRetries; retryCount++) {
             try {
                 logger.info(format("Attempting re-connection %2d /%2d", (retryCount + 1), maxRetries));
+
+                /**
+                 * Need to call disconnect because in several scenarios, like Redis server restart, Jedis' isConnected
+                 * method weirdly returns true and connect method first checks for isConnected before connecting.
+                 * So need to call disconnect first in order to bring Jedis to a clean state
+                 */
+                client.disconnect();
                 client.connect();
+
                 if(client.isConnected())
                     break;
                 else
