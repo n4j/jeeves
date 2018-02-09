@@ -17,13 +17,10 @@ limitations under the License.
 package io.artofcode.state;
 
 import io.artofcode.TestHelper;
-import io.artofcode.state.WorkerState;
 
 import static java.lang.String.*;
 
 import java.io.IOException;
-import java.nio.file.Path;
-import java.util.concurrent.ThreadLocalRandom;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;

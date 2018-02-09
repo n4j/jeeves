@@ -34,11 +34,9 @@ public class RedisQueueManager implements AutoCloseable {
 
     private final Jedis jedis;
 
-    private final Map<String, String> configuration;
-
     public RedisQueueManager(String queue) {
         this.queue = queue;
-        this.configuration = ConfigurationManager.getInstance().get(queue);
+        Map<String, String> configuration = ConfigurationManager.getInstance().get(queue);
         this.jedis = new Jedis(configuration.get("REDIS_HOST"));
     }
 

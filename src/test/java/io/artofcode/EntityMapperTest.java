@@ -16,16 +16,11 @@ limitations under the License.
 
 package io.artofcode;
 
-import static java.lang.String.*;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import com.google.gson.*;
-
 import java.io.IOException;
-import java.nio.file.Path;
 
 /**
  * Unit test for simple App.

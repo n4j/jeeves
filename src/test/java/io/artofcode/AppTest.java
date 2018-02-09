@@ -19,7 +19,6 @@ package io.artofcode;
 import static java.lang.String.*;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;

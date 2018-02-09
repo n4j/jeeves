@@ -17,7 +17,6 @@ limitations under the License.
 package io.artofcode.config;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Map;
 import java.util.logging.Logger;
 
