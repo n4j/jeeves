@@ -38,7 +38,7 @@ class RedisConnectionMonitor {
 
     private final int maxRetries;
 
-    public RedisConnectionMonitor(Jedis client, int maxRetries) {
+    RedisConnectionMonitor(Jedis client, int maxRetries) {
         this.client = client;
         this.maxRetries = maxRetries;
     }

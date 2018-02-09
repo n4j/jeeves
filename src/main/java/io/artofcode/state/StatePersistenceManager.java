@@ -78,11 +78,9 @@ public class StatePersistenceManager {
 		}
 		
 		try(FileOutputStream fout = new FileOutputStream(getQueueStatePath(queue))) {
-			queueProperties.save(fout, String.format("AUTO GENERATED STATE FILE. DO NOT EDIT!!!!"));
-		} catch(FileNotFoundException fnfe) {
-			throw new RuntimeException(fnfe);
-		} catch(IOException ioe) {
-			throw new RuntimeException(ioe);
+			queueProperties.save(fout, "AUTO GENERATED STATE FILE. DO NOT EDIT!!!!");
+		} catch(Exception ex) {
+			throw new RuntimeException(ex);
 		}
 	}
 
@@ -118,7 +116,7 @@ public class StatePersistenceManager {
 			return queueProperties;
 
 		} catch(FileNotFoundException fnfe) {
-			// Properties file doesnot exist, return empty properties
+			// Properties file does not exist, return empty properties
 			return new Properties();
 		} catch(IOException ioe) {
 			throw new RuntimeException(ioe);
