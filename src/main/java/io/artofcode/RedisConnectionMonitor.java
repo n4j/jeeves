@@ -69,9 +69,11 @@ class RedisConnectionMonitor {
     }
 
     private void checkAndReconnect() {
-        for (int retryCount = 0;
-             !client.isConnected() && retryCount < maxRetries;
-             retryCount++) {
+        if(client.isConnected()) {
+            logger.info("Client connected, re-connection not required.");
+            return;
+        }
+        for (int retryCount = 0; retryCount < maxRetries; retryCount++) {
 
             try {
                 logger.info(format("Attempting re-connection %2d /%2d", (retryCount + 1), maxRetries));
