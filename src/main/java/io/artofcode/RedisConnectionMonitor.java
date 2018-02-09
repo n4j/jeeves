@@ -38,6 +38,8 @@ class RedisConnectionMonitor {
 
     private final int maxRetries;
 
+    private boolean invokedFirstCall = false;
+
     public RedisConnectionMonitor(Jedis client, int maxRetries) {
         this.client = client;
         this.maxRetries = maxRetries;
@@ -54,7 +56,11 @@ class RedisConnectionMonitor {
      * @throws RuntimeException
      */
     public <T> T invoke(Callable<T> action) {
-        checkAndReconnect();
+        if(invokedFirstCall)
+            checkAndReconnect();
+        else
+            invokedFirstCall = true;
+
         try {
             return action.call();
         } catch (Exception ex) {
