@@ -38,8 +38,6 @@ class RedisConnectionMonitor {
 
     private final int maxRetries;
 
-    private boolean invokedFirstCall = false;
-
     public RedisConnectionMonitor(Jedis client, int maxRetries) {
         this.client = client;
         this.maxRetries = maxRetries;
