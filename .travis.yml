@@ -4,6 +4,9 @@ jdk: oraclejdk8
 
 services: redis-server
 
+sudo: required
+dist: trusty
+
 addons:
   sonarcloud:
     organization: "n4j-github"
