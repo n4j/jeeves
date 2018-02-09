@@ -34,8 +34,10 @@ public class RedisConnectionMonitorTest extends TestCase {
 
     private void simulateNetworkInterruption() {
         try {
+
             Process process = Runtime.getRuntime()
                     .exec("sudo service redis-server restart");
+
             try(BufferedReader err = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
                 String line;
                 while ((line = err.readLine()) != null)
@@ -46,7 +48,10 @@ public class RedisConnectionMonitorTest extends TestCase {
                 while ((line = in.readLine()) != null)
                     logger.info(line);
             }
-            logger.info(format("Process exited with code %d", process.waitFor()));
+
+            int returnCode = process.waitFor();
+            logger.info(format("Process exited with code %d", returnCode));
+            assertTrue(returnCode == 0);
         } catch (IOException ioe) {
             logger.log(Level.SEVERE, "Error while executing 'sudo service redis-server restart'", ioe);
         } catch (InterruptedException ie) {
@@ -64,9 +69,10 @@ public class RedisConnectionMonitorTest extends TestCase {
         }
 
         RedisQueueManager manager = new RedisQueueManager("default");
+        manager.createWorkerId();
         simulateNetworkInterruption();
         long workerId =  manager.createWorkerId();
 
-        assert (workerId > 0);
+        assertTrue (workerId > 0);
     }
 }
