@@ -39,14 +39,18 @@ public class RedisConnectionMonitorTest extends TestCase {
                     .exec("sudo service redis-server restart");
 
             try(BufferedReader err = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
+                StringBuffer buffer = new StringBuffer();
                 String line;
                 while ((line = err.readLine()) != null)
-                    logger.severe(line);
+                    buffer.append(line);
+                logger.severe(buffer.toString());
             }
             try(BufferedReader in = new BufferedReader( new InputStreamReader(process.getInputStream()))) {
+                StringBuffer buffer = new StringBuffer();
                 String line;
                 while ((line = in.readLine()) != null)
-                    logger.info(line);
+                    buffer.append(line);
+                logger.info(buffer.toString());
             }
 
             int returnCode = process.waitFor();
