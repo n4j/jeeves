@@ -38,24 +38,29 @@ public class ConfigurationManager {
 
     private static ConfigurationManager instance;
 
-    private static Map<String, Map<String, String>> properties;
-
     private static Logger logger = Logger.getLogger(ConfigurationManager.class.toString());
+
+    private final Map<String, Map<String, String>> properties;
 
     static {
         synchronized(ConfigurationManager.class) {
             validateConfigPath();
             try {
-                instance = new ConfigurationManager();
-                properties = loadConfigProperties();
+                Map<String, Map<String, String>> properties = loadConfigProperties();
+                instance = new ConfigurationManager(properties);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
+    @SuppressWarnings("unused")
     private ConfigurationManager() {
+        this(null);
+    }
 
+    private ConfigurationManager(Map<String, Map<String, String>> properties) {
+        this.properties = properties;
     }
 
     public static ConfigurationManager getInstance() {
@@ -71,33 +76,30 @@ public class ConfigurationManager {
 
     private static Map<String, Map<String, String>> loadConfigProperties() {
         Map<String, Map<String, String>> allProperties = new HashMap<>();
-        
         String configPath = getDefaultConfigPath();
-
         File configDir = new File(configPath);
         File[] files = configDir.listFiles((file) -> file.isFile());
-        
         Properties defaultProperties = getDefaultConfig();
+
         allProperties.put("default", propsToMap(defaultProperties));
 
-        for(int i = 0; i<files.length; i++) {
-
+        for(File file : files) {
             // Skip over default config file as we have already loaded it
-            if(files[i].equals("default")) {
+            if(file.getName().compareToIgnoreCase("default") == 0) {
                 continue;
             }
 
             Properties property = new Properties(defaultProperties);
             try {
-                try(FileReader reader = new FileReader(files[i])) {
-                    property.load(new FileReader(files[i]));
+                try(FileReader reader = new FileReader(file)) {
+                    property.load(reader);
                     allProperties.put(
-                            removeExtension(files[i].getName()),
+                            removeExtension(file.getName()),
                             propsToMap(property)
                     );
                 }
             } catch(IOException ioe) {
-                continue;
+                logger.log(Level.SEVERE, "Error while reading properties file", ioe);
             }
         }
         return allProperties;
@@ -134,12 +136,12 @@ public class ConfigurationManager {
 
     private static Properties getEnvironmentConfig() {
         Properties envProperties = new Properties();
-        for(int i=0; i<configKeys.length; i++) {
-            String env = System.getenv(configKeys[i]);
+        for(String configKey : configKeys) {
+            String env = System.getenv(configKey);
             if(env == null || env.isEmpty()) {
                 continue;
             }
-            envProperties.setProperty(configKeys[i], env);
+            envProperties.setProperty(configKey, env);
         }
         return envProperties;
     }
@@ -147,8 +149,9 @@ public class ConfigurationManager {
     private static Map<String, String> propsToMap(Properties properties) {
         Map<String, String> propsMap = new HashMap<>();
 
-        // Have to do it this way because Properties.entrySet() doesn't
-        // return default properties, which is crucial for us.
+        /* Have to do it this way because Properties.entrySet() doesn't return default properties, which is crucial
+         * for us.
+         */
         Enumeration<?> keyNames = properties.propertyNames();
         while(keyNames.hasMoreElements()){
             String keyName = keyNames.nextElement().toString();
@@ -168,13 +171,12 @@ public class ConfigurationManager {
     private static void validateConfigPath() {
         String configPath = getDefaultConfigPath();
         if(configPath == null)
-            throw new RuntimeException("JEEVES_CONFIG variable not set, JEEVES_CONFIG must point to a directory"+
+            throw new RuntimeException("JEEVES_CONFIG variable not set. JEEVES_CONFIG must point to a directory"+
                     "containing configuration files for Jeeves. It can be set via environment variable or via -D option");
     }
 
     @SuppressWarnings("unused")
     private ConfigurationManager readResolve() {
-
         return instance;
     }
 }

@@ -68,9 +68,9 @@ class RedisConnectionMonitor {
     }
 
     private void checkAndReconnect() {
-        for (int retryCount = 0; retryCount < maxRetries; retryCount++) {
+        for (int retryCount = 1; retryCount < (maxRetries+1); retryCount++) {
             try {
-                logger.info(format("Attempting re-connection %2d /%2d", (retryCount + 1), maxRetries));
+                logger.info(format("Attempting re-connection %2d /%2d", retryCount, maxRetries));
 
                 /**
                  * Need to call disconnect because in several scenarios, like Redis server restart, Jedis' isConnected
@@ -94,7 +94,7 @@ class RedisConnectionMonitor {
         /**
          * If we have attempted re-connection for maxRetries then give up and throw the exception to the client
          **/
-        if ((retryCount + 1) == maxRetries) {
+        if (retryCount == maxRetries) {
             if(jce != null)
                 throw new RuntimeException(jce);
             else
@@ -103,7 +103,6 @@ class RedisConnectionMonitor {
 
         logger.log(Level.SEVERE, "Connection attempt failed", jce);
         logger.info("Retrying after 1000ms");
-
         try {
             Thread.sleep(1000L);
         } catch (InterruptedException ie) {

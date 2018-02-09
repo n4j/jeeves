@@ -33,7 +33,7 @@ class QueuedJobRetriever {
 
     private final String queue;
 
-    private final String inProcessQueue;
+    private final String inprocessQueue;
 
     private static final int WAIT_TIMEOUT = 10;
 
@@ -41,9 +41,9 @@ class QueuedJobRetriever {
 
     private final Logger logger = Logger.getLogger(QueuedJobRetriever.class.toString());
 
-    QueuedJobRetriever(String queue, String inProcessQueue) {
+    QueuedJobRetriever(String queue, String inprocessQueue) {
         this.queue = queue;
-        this.inProcessQueue = inProcessQueue;
+        this.inprocessQueue = inprocessQueue;
         this.rqm = new RedisQueueManager(queue);
     }
 
@@ -60,7 +60,7 @@ class QueuedJobRetriever {
         String payload = null;
         while(continuePolling && payload == null) {
             logger.info(format("Polling job from queue %s with wait timeout %d", queue, WAIT_TIMEOUT));
-            payload = rqm.brpoplpush(inProcessQueue, WAIT_TIMEOUT);
+            payload = rqm.brpoplpush(inprocessQueue, WAIT_TIMEOUT);
         }
         return payload;
     }

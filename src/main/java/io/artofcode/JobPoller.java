@@ -20,8 +20,8 @@ import io.artofcode.state.WorkerState;
 import java.util.Iterator;
 
 /**
- * This class exposes an Iterable which which fetches available jobs from the queue.
- * It is guaranteed that no two workers will fetch the same job ever.
+ * This class exposes an Iterable which which fetches available jobs from the queue. It is guaranteed that no two
+ * workers will fetch the same job ever. This class also exposes methods to stop polling for more jobs.
  *
  * @author Neeraj Shah
  * @since 0.1
@@ -43,9 +43,8 @@ class JobPoller implements Iterable<String> {
     }
 
     /**
-     * This method will be usually called from an external Thread to notify the
-     * poller to stop polling gracefully. The poller may not stop immediately and
-     * a task may be returned before it finally stops.
+     * This method will be usually called from an external Thread to notify the poller to stop polling gracefully. The
+     * poller may not stop immediately and a task may be returned before it finally stops.
      */
     public synchronized void stopPolling() {
         jobIterator.stopPolling();
@@ -53,8 +52,14 @@ class JobPoller implements Iterable<String> {
    
     private class JobPollerIterator implements Iterator<String> {
 
+        /**
+         * The worker id of this job processor
+         * */
         private final long workerId;
 
+        /**
+         * Saved previous state of the worker
+         * */
         private final WorkerState state;
 
         private final QueuedJobRetriever retriver;
@@ -65,6 +70,11 @@ class JobPoller implements Iterable<String> {
             this.retriver = new QueuedJobRetriever(queue, state.getInprocessQueueName(workerId));
         }
 
+        /**
+         *
+         * @return - This method always returns true as we are assuming constant flow of tasks to be coming in the queue
+         * and there is no way for us to tell when the jobs would cease to come
+         * */
         @Override
         public boolean hasNext() { return true; }
 
@@ -73,6 +83,10 @@ class JobPoller implements Iterable<String> {
             return retriver.retrieveNext();
         }
 
+        /**
+         * Indicates JobRetriever that it should stop polling for more jobs. After calling this method its possible that
+         * at the most one job is returned by the JobRetriever before it ceases to poll for more jobs
+         * */
         private synchronized void stopPolling() {
             retriver.stopPolling();
         }
