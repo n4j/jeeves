@@ -26,4 +26,4 @@ hs_err_pid*
 .idea
 target
 jeeves.iml
-src/test/java/io/artofcode/TestHelper.java
+*.out
